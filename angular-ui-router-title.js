@@ -22,20 +22,28 @@ angular.module("ui.router.title", ["ui.router"])
 
 			$rootScope.$breadcrumbs = [];
 			var state = $state.$current;
-			while(state) {
-				if(state.resolve && state.resolve.$title) {
-					$rootScope.$breadcrumbs.unshift({
-						title: getTitleValue(state.locals.globals.$title),
-						state: state.self.name,
-						stateParams: state.locals.globals.$stateParams
-					})
-				}
-				state = state.parent;
+			while (state) {
+			    var stateName = getStateName(state);
+			    if (state.resolve && state.resolve.$title && stateName) {
+			        $rootScope.$breadcrumbs.unshift({
+			            title: getTitleValue(state.locals.globals.$title),
+			            state: stateName,
+			            stateParams: state.locals.globals.$stateParams
+			        })
+			    }
+			    state = state.parent;
 			}
 		});
 
 		function getTitleValue(title) {
 			return angular.isFunction(title) ? title() : title;
+		}
+
+		function getStateName(state) {
+		    if (state.abstract)
+		        return state.self.defaultSubstate ? state.self.defaultSubstate : null;
+		    else
+		        return state.self.name;
 		}
 
 	}]);
